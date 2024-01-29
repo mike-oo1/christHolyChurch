@@ -11,6 +11,8 @@ const Router = express()
 Router.route("/signup").post(signUp)
 Router.route("/signin").post(signin)
 
+
+
 Router.route("/signout/:id").post(signOut)
 Router.route("/changepass/:id").put(changePassword)
 Router.route("/getallusers").get(getallusers)
