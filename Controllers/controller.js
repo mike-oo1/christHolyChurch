@@ -1,11 +1,18 @@
 const userModel = require("../Model/model")
 require("dotenv").config()
+const nodemailer=require("nodemailer")
 const bcrypt = require("bcrypt")
 const jwt =require("jsonwebtoken")
-const mailTemp =require("../index")
-
 const mailSender =require("../Controllers/mail")
-const {generateDynamicEmail}=require("../Utils/mailTemp")
+
+const transporter = nodemailer.createTransport({
+    service: process.env.service,
+    auth: {
+      user: process.env.user,
+      pass: process.env.password
+    }
+  })
+
 exports.signUp =async(req,res)=>{
     try {
         const {firstName,lastName,email,password,confirmPassword,phoneNumber}= req.body
@@ -22,16 +29,15 @@ exports.signUp =async(req,res)=>{
           confirmPassword:hash,
           phoneNumber
         }
-     if(!firstName||!lastName ||!email||!password||!confirmPassword,!phoneNumber){
+     if(!firstName||!lastName ||!email||!password||!confirmPassword||!phoneNumber){
          return res.status(400).json({
             message:"field cant be left empty"
-           
          })            
      
-        //  }else if(checkMail){
-        //     return res.status(300).json({
-        //         message:`this email  ${email} is associated with an account on this platform`
-        //     })
+         }else if(checkMail){
+            return res.status(300).json({
+                message:`this email  ${email} is associated with an account on this platform`
+            })
         }else if(confirmPassword!==password){
             return res.status(300).json({
                 message:"password does not match"
@@ -42,37 +48,36 @@ exports.signUp =async(req,res)=>{
                 message: "phone number must be a min of 6 and a max 0f 14"
             })
         }else if(password.length<8||password.length>20){
-            return res.status(400).json( {
+            return res.status(400).json({
                 message:"password must be a minimum of 8 characters and a maximum of 20 characters"
             } )
         }
-        const createUser =await new userModel(data)
-        // generate the token
-
+        const createdUser =await new userModel(data)
         const newToken = jwt.sign({
             email,
             password
         },process.env.JWT_TOKEN,{expiresIn: "1d"})
-        createUser.Token = newToken
-        const subject ="KINDLY VERIFY BRO"
-        const link =`${req.protocol}: //${req.get("host")}/userverify${createUser._id}/${newToken}`
+        createdUser.Token = newToken
+        const subject ="ACCOUNT CREATED"
+        const link =`${req.protocol}: //${req.get("host")}/welcome on board${createdUser._id}/${newToken}`
         const message =`click on this link${link} to verify, kindly note that this link will expire after 5 minutes`
-        msg = await generateDynamicEmail()
+     
+
+    
         mailSender(
             {
                 from:"gmail",
-                email:createUser.email,
-                subject:`kindly verify`,
-                message:msg
+                email:createdUser.email,
+                subject: subject,
+                message:"you have successfully created an account with christ holy church",
+                data:message
+                
             }
         )
-    
-    
-     await createUser.save()
+     await createdUser.save()
      res.status(200).json({
-         message:"created",
-         message:"please click on this link to navigate you to the login page",
-         data:createUser
+         message:" info created and saved successfully",
+         data:createdUser
      })
     
     
@@ -82,8 +87,6 @@ exports.signUp =async(req,res)=>{
         })
     }
 }
-
-
 exports.signin= async(req,res)=>{
     try {
         const {password,phoneNumber}=req.body
@@ -91,7 +94,7 @@ exports.signin= async(req,res)=>{
         
          if(!checkNumber){
             return res.status(300).json({
-                message: "wrong phone number  format"
+                message: "number not registered on this platform"
             })
         }
         const checkPassword = await bcrypt.compare(password,checkNumber.password)
@@ -112,12 +115,74 @@ exports.signin= async(req,res)=>{
                 message:`${checkNumber.firstName}  your log in is successful`,
                 data:checkNumber
             })
-        } 
-
-    
+        }    
     } catch (error) {
         return res.status(500).json({
             message:error.message
+        })
+    }
+} 
+exports.userVerify =async(req,res)=>{
+    try {
+        const registeredUser = await userModel.findById(req.params.id)
+        const registeredToken= registeredUser.Token
+        await jwt.verify(registeredToken,process.env.JWT_TOKEN,{expiresIn:"50m"},(err,data)=>{
+            if(err){
+                return res.status(300).json({
+                    message:"this link has expired"
+                })
+            }else{
+                return data
+            }
+        })
+        const verified =await userModel.findByIdAndUpdate(req.params.id,{isVerified:true},)
+        if(!verified){
+            return res.status(400).json({
+                message:"unable to verify user"
+            })
+        }else{
+            return res.status(200).json({
+                message:"user has been verified successfully"
+            })
+        }
+        
+    } catch (error) {
+        return res.status(200).json({
+            message:"user has been verified successfully"
+        })
+       
+        
+    }
+}
+exports.resendVerificationEmail = async (req, res) => {
+    try {
+        const {email} = req.body
+        const user = await userModel.findOne( { email: email.toLowerCase()})
+        if (!user){
+            return res.status(404).json({
+                error: "user  not found"
+            })
+        }
+            const token = await jwt.sign( {email: email.toLowerCase()}, process.env.JWT_TOKEN, {expiresIn:"50m"} )
+            
+           
+            const mailOptions = {
+                from: process.env.user,
+                to: email,
+                subject: "Verify your account",
+                html: `Please click on the link to verify your email: <a href="${req.protocol}://${req.get("host")}/api/users/verify-email/${token}">Verify Email</a>`,
+            }
+
+
+            await transporter.sendMail(mailOptions)
+
+        res.status(200).json( {
+            message: `Verification email sent successfully to your email: ${user.email}`
+        })
+
+    } catch(error){
+        res.status(500).json({
+            message: error.message
         })
     }
 }
@@ -128,7 +193,7 @@ exports.changePassword =async(req,res)=>{
         const salt =await bcrypt.genSaltSync(10)
         const hash = await bcrypt.hashSync(password,salt)
         const resetDetails ={
-            password:hash
+        password:hash
         }
         const resetResult = await userModel.findByIdAndUpdate(id,resetDetails,{password:hash},
             {new:true})
@@ -152,20 +217,42 @@ exports.changePassword =async(req,res)=>{
 
 exports.signOut= async(req,res)=>{
     try {
-        const user =await userModel.findById(req.user._id)
+        const id = req.params.id
+        const user =await userModel.findById(id)
         const bin =[]
         const hasAuth = req.headers.authorization
-        const token = hasAuth.split(" ")[1]
-        bin.push(token)
+        // const token = hasAuth.split(" ")[1]
+        bin.push(hasAuth)
         user.isLoggedin =false
         await user.save()
         return res.status(201).json({
-            message:"this user has been logged out successfully"
+            message:"this user has been logged out successfully",
+            data:user.id
         })
     } catch (error) {
         return res.status(500).json({   
             message:error.message
         })
         
+    }
+}
+exports.getallusers = async(req,res)=>{
+    try {
+        const getAllUsers = await userModel.find()
+        if(!getAllUsers){
+            return res.status(404).json({
+                message:"cannot get all users"
+            })
+        }else{
+            return res.status(200).json({
+                message:"here are all the users",
+                data:` there are  ${getAllUsers.length} users on the platform`,
+                data2:getAllUsers
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({   
+            message:error.message
+        })
     }
 }

@@ -2,28 +2,22 @@ const mongoose =require("mongoose")
 
 const myInfo = new mongoose.Schema({
     firstName:{
-        type:String,
-        required:[true,"first name is required"]
+        type:String
     },
     lastName:{
-        type:String,
-        required:[true,"last name is required"]
+        type:String
     },
     email:{
-        type:String,
-        required:[true,"email is equired"]
+        type:String
     },
     password:{
-        type:String,
-        required:[true,"password is required"]
+        type:String
     },
     confirmPassword:{
-        type:String,
-        required:[true,"confirm password is reequired"]
+        type:String
     },
     phoneNumber:{
-        type:String,
-        required:[true,"phone number is required"]
+        type:String
     },
     isAdmin:{
         type:Boolean,
@@ -32,6 +26,9 @@ const myInfo = new mongoose.Schema({
     isverified:{
         type:Boolean,
         default:false
+    },
+    Token:{
+        type:String
     }
 })
 const myDetails = mongoose.model("users",myInfo)
