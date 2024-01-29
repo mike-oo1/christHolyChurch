@@ -22,7 +22,7 @@ Router.route("/re-verify/:id/:token").put(resendVerificationEmail)
 Router.route("/newpriest").post(uploads.single("addImage"),newPriest)
 Router.route("/getall").get(isAdminAuthorized,getAllPriest)
 Router.route("/getone/:id").get(isAdminAuthorized,getOnePriest)
-Router.route("/update/:id").put(isAdminAuthorized,updatePriest)
+Router.route("/update/:id").put(updatePriest)
 Router.route("/delete/:id").delete(isAdminAuthorized,deletePriest)
 
 

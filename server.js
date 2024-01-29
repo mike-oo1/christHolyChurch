@@ -13,7 +13,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use("/api",route)
 app.use(cors({
-    origin: '*',
+    origin: '*', 
     methods: ["GET","POST","PUT","DELETE"]
 }))
 app.use("/priestsImage", express.static(__dirname + "/priestsImage"))

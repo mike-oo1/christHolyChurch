@@ -257,40 +257,4 @@ exports.getallusers = async(req,res)=>{
     }
 }
 
-// exports.login = async(req,res)=>{
-//     try {
-//         const {firstName,email,password} = req.body
-//         const checks = await userModel.find({email:email},{firstName:firstName})
- 
-//         if(!checks){
-//             return res.status(400).json({
-//                 message:"details not found "
-//             })
-//         }
-//         const checkPassword = await bcrypt.compare(password,checks.password)
-//         if(!checkPassword){
-//             return res.status(300).json({
-//                 message:"wrong password"
-//             })
-//         }else{
-//             const createToken =jwt.sign({
-//                 email,
-//                 firstName,
-//                 password
-//             },process.env.JWT_TOKEN,{expiresIn :"1d"})
-//             checks.Token =createToken
-//             await check.save()
-//             return res.status(201).json({
-//                 status:"successful",
-//                 message:`${check.firstName}  your log in is successful`,
-//                 data:check
-//             })
-//         }  
 
-
-//     } catch (error) {
-//         return res.status(500).json({   
-//             message:error.message
-//         })
-//     }
-// }
