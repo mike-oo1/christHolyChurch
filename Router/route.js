@@ -10,7 +10,7 @@ const Router = express()
 
 Router.route("/signup").post(signUp)
 Router.route("/signin").post(signin)
-Router.route("/login").post(login)
+
 
 
 
