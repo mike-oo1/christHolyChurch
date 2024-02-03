@@ -18,6 +18,7 @@ exports.signUp =async(req,res)=>{
         const {firstName,lastName,email,password,confirmPassword,phoneNumber}= req.body
 
         const checkMail =await userModel.findOne({email:email})
+        const checkNumber =await userModel.findOne({phoneNumber:phoneNumber})
 
         const salt =await bcrypt.genSaltSync(10)
         const hash = await bcrypt.hashSync(password,salt)
@@ -43,11 +44,17 @@ exports.signUp =async(req,res)=>{
                 message:"password does not match"
             })
 
-        }else if(phoneNumber.length < 6 || phoneNumber.length>14 ){
+        }else if(checkNumber){
             return res.status(400).json({
-                message: "phone number must be a min of 6 and a max 0f 14"
+                message:"phone number already in use"
             })
-        }else if(password.length<8||password.length>20){
+
+        }
+        else if(phoneNumber.length < 14){
+            return res.status(400).json({
+                message: "phone number must be 14 characters +234 included"
+            })
+        }else if(password.length<8){
             return res.status(400).json({
                 message:"password must be a minimum of 8 characters and a maximum of 20 characters"
             } )
@@ -60,7 +67,7 @@ exports.signUp =async(req,res)=>{
         createdUser.Token = newToken
         const subject ="ACCOUNT CREATED"
         const link =`${req.protocol}: //${req.get("host")}/welcome on board${createdUser._id}/${newToken}`
-        const message =`click on this link${link} to verify, kindly note that this link will expire after 5 minutes`
+
      
 
     
@@ -126,7 +133,7 @@ exports.userVerify =async(req,res)=>{
     try {
         const registeredUser = await userModel.findById(req.params.id)
         const registeredToken= registeredUser.Token
-        await jwt.verify(registeredToken,process.env.JWT_TOKEN,{expiresIn:"50m"},(err,data)=>{
+        await jwt.verify(registeredToken,process.env.JWT_TOKEN,{expiresIn:"1d"},(err,data)=>{
             if(err){
                 return res.status(300).json({
                     message:"this link has expired"
@@ -163,7 +170,7 @@ exports.resendVerificationEmail = async (req, res) => {
                 error: "user  not found"
             })
         }
-            const token = await jwt.sign( {email: email.toLowerCase()}, process.env.JWT_TOKEN, {expiresIn:"50m"} )
+            const token = await jwt.sign( {email: email.toLowerCase()}, process.env.JWT_TOKEN, {expiresIn:"1d"} )
             
            
             const mailOptions = {
@@ -256,5 +263,13 @@ exports.getallusers = async(req,res)=>{
         })
     }
 }
+
+
+
+
+
+
+
+
 
 

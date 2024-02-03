@@ -3,13 +3,14 @@ const uploads =require("../Utils/multer")
 const cloudinary =require("../Utils/cloudinary")
 const {isAdminAuthorized}=require("../Middleware/authorization")
 
-const {signUp,signin,signOut,changePassword,getallusers,userVerify,resendVerificationEmail}=require("../Controllers/controller")
+const {signUp,signin,signOut,changePassword,getallusers,userVerify,resendVerificationEmail,login}=require("../Controllers/controller")
 const{newPriest,getAllPriest,getOnePriest,updatePriest,deletePriest}=require("../Controllers/priests")
 const Router = express()
 
 
 Router.route("/signup").post(signUp)
 Router.route("/signin").post(signin)
+Router.route("/login").post(login)
 
 
 
@@ -24,8 +25,6 @@ Router.route("/getall").get(getAllPriest)
 Router.route("/getone/:id").get(isAdminAuthorized,getOnePriest)
 Router.route("/update/:id").put(updatePriest)
 Router.route("/delete/:id").delete(isAdminAuthorized,deletePriest)
-
-
 
 
 module.exports =Router 
