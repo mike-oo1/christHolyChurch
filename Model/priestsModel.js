@@ -16,10 +16,7 @@ const priestsDetails = new mongoose.Schema({
         type:String,
         required:[true,"location is required"]
     },
-    yearLivingTransferred:{
-        type:String,
-        required:[true,"required"]
-    },
+ 
     selectStation:{
         type:String
 
