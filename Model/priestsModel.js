@@ -1,6 +1,10 @@
 const mongoose = require("mongoose")
 const priestsDetails = new mongoose.Schema({
-    fullName:{
+    firstName:{
+        type:String,
+        required:[true,"priest name is required"]
+    },
+    lastName:{
         type:String,
         required:[true,"priest name is required"]
     },
@@ -21,7 +25,7 @@ const priestsDetails = new mongoose.Schema({
         type:String
 
     },
-    District:{
+    district:{
         type:String
 
     },

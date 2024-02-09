@@ -3,16 +3,17 @@ const cloudinary = require("cloudinary")
 
 exports.newPriest = async ( req, res ) => {
     try {
-        const{fullName,rankInChurch,phoneNumber,yearTransferred,station,District,gender}=req.body
+        const{firstName,lastName,rankInChurch,phoneNumber,yearTransferred,station,district,gender}=req.body
       
         console.log(req.body)
         const data ={
-            fullName,
+            firstName,
+            lastName,
             rankInChurch,
             phoneNumber,
             yearTransferred,
             station,
-            District,
+            district,
             gender,
             addImage:req.file.path
         }
@@ -21,21 +22,22 @@ exports.newPriest = async ( req, res ) => {
            result = await cloudinary.uploader.upload(req.file.path)
         }
         const priestInfo = new myPriest({
-            fullName,
+            firstName,
+            lastName,
             rankInChurch,
             phoneNumber, 
             yearTransferred,
             station,
-            District,
+            district,
             gender,
             addImage:result?.secure_url
                 })
-        if(!fullName||!rankInChurch||!phoneNumber||!yearTransferred||!station||!District||!gender){
+        if(!firstName||!lastName||!rankInChurch||!phoneNumber||!yearTransferred||!station||!district||!gender){
             return res.status(300).json({
                 message:`field  cannot be left empty`
             })
         }else if(phoneNumber.length<11){
-            return res.status(400).json({
+            return res.status(400).json({ 
                 message:"phone number should be  of 11 characters"
             })
 

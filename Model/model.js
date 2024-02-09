@@ -13,9 +13,6 @@ const myInfo = new mongoose.Schema({
     password:{
         type:String
     },
-    confirmPassword:{
-        type:String
-    },
     phoneNumber:{
         type:String
     },

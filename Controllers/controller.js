@@ -15,7 +15,7 @@ const mailSender =require("../Controllers/mail")
 
 exports.signUp =async(req,res)=>{
     try {
-        const {firstName,lastName,email,password,confirmPassword,phoneNumber}= req.body
+        const {firstName,lastName,email,password,phoneNumber}= req.body
 
         const checkMail =await userModel.findOne({email:email})
         const checkNumber =await userModel.findOne({phoneNumber:phoneNumber})
@@ -27,10 +27,9 @@ exports.signUp =async(req,res)=>{
           lastName,
           email,
           password:hash,
-          confirmPassword:hash,
           phoneNumber
         }
-     if(!firstName||!lastName ||!email||!password||!confirmPassword||!phoneNumber){
+     if(!firstName||!lastName ||!email||!password||!phoneNumber){
          return res.status(400).json({
             message:"field cant be left empty"
          })            
@@ -38,10 +37,6 @@ exports.signUp =async(req,res)=>{
          }else if(checkMail){
             return res.status(300).json({
                 message:`this email  ${email} is associated with an account on this platform`
-            })
-        }else if(confirmPassword!==password){
-            return res.status(300).json({
-                message:"password does not match"
             })
 
         }else if(checkNumber){
