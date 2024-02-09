@@ -45,9 +45,9 @@ exports.signUp =async(req,res)=>{
             })
 
         }
-        else if(phoneNumber.length < 14){
+        else if(phoneNumber.length <11){
             return res.status(400).json({
-                message: "phone number must be 14 characters +234 included"
+                message: "phone number must be 11 characters"
             })
         }else if(password.length<8){
             return res.status(400).json({
