@@ -17,11 +17,11 @@ const priestsDetails = new mongoose.Schema({
         required:[true,"location is required"]
     },
  
-    selectStation:{
+    station:{
         type:String
 
     },
-    selectDistrict:{
+    District:{
         type:String
 
     },

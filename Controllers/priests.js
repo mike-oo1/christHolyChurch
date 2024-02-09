@@ -3,7 +3,7 @@ const cloudinary = require("cloudinary")
 
 exports.newPriest = async ( req, res ) => {
     try {
-        const{fullName,rankInChurch,phoneNumber,yearTransferred,selectStation,selectDistrict,gender}=req.body
+        const{fullName,rankInChurch,phoneNumber,yearTransferred,station,District,gender}=req.body
       
         console.log(req.body)
         const data ={
@@ -11,8 +11,8 @@ exports.newPriest = async ( req, res ) => {
             rankInChurch,
             phoneNumber,
             yearTransferred,
-            selectStation,
-            selectDistrict,
+            station,
+            District,
             gender,
             addImage:req.file.path
         }
@@ -25,12 +25,12 @@ exports.newPriest = async ( req, res ) => {
             rankInChurch,
             phoneNumber, 
             yearTransferred,
-            selectStation,
-            selectDistrict,
+            station,
+            District,
             gender,
             addImage:result?.secure_url
                 })
-        if(!fullName||!rankInChurch||!phoneNumber||!yearTransferred||!selectStation||!selectDistrict||!gender){
+        if(!fullName||!rankInChurch||!phoneNumber||!yearTransferred||!station||!District||!gender){
             return res.status(300).json({
                 message:`field  cannot be left empty`
             })

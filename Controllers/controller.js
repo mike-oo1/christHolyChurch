@@ -5,13 +5,13 @@ const bcrypt = require("bcrypt")
 const jwt =require("jsonwebtoken")
 const mailSender =require("../Controllers/mail")
 
-const transporter = nodemailer.createTransport({
-    service: process.env.service,
-    auth: {
-      user: process.env.user,
-      pass: process.env.password
-    }
-  })
+// const transporter = nodemailer.createTransport({
+//     service: process.env.service,
+//     auth: {
+//       user: process.env.user,
+//       pass: process.env.password
+//     }
+//   })
 
 exports.signUp =async(req,res)=>{
     try {
@@ -76,8 +76,7 @@ exports.signUp =async(req,res)=>{
                 from:"gmail",
                 email:createdUser.email,
                 subject: subject,
-                message:"you have successfully created an account with christ holy church",
-                data:message
+                message:"you have successfully created an account with christ holy church"
                 
             }
         )
