@@ -10,12 +10,13 @@ require ("dotenv").config()
 const route= require("./Router/route")
 const app = express()
 app.use(express.json()) 
-app.use(express.urlencoded({extended:true}))
-app.use("/api",route)
 app.use(cors({
     origin: '*', 
     methods: ["GET"]
 }))
+app.use(express.urlencoded({extended:true}))
+app.use("/api",route)
+
 app.use("/priestsImage", express.static(__dirname + "/priestsImage"))
 
 
