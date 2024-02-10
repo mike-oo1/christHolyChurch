@@ -14,7 +14,7 @@ app.use(express.urlencoded({extended:true}))
 app.use("/api",route)
 app.use(cors({
     origin: '*', 
-    methods: ["GET","POST","PUT","DELETE"]
+    methods: ["GET"]
 }))
 app.use("/priestsImage", express.static(__dirname + "/priestsImage"))
 
