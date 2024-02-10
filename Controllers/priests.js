@@ -36,7 +36,7 @@ exports.newPriest = async ( req, res ) => {
             return res.status(300).json({
                 message:`field  cannot be left empty`
             })
-        }else if(phoneNumber.length<11){
+        }else if(phoneNumber.length!==11){
             return res.status(400).json({ 
                 message:"phone number should be  of 11 characters"
             })
