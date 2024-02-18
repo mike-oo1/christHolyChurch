@@ -25,10 +25,10 @@ exports.signUp =async(req,res)=>{
         const data ={
           firstName,
           lastName,
-          email,
+          email, 
           password:hash,
           phoneNumber
-        }
+        } 
      if(!firstName||!lastName ||!email||!password||!phoneNumber){
          return res.status(400).json({
             message:"field cant be left empty"
