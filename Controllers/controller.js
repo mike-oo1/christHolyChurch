@@ -18,7 +18,7 @@ exports.signUp =async(req,res)=>{
         const {username,email,password,phonenumber}= req.body
 
         const checkMail =await userModel.findOne({email:email})
-        const checkNumber =await userModel.findOne({phoneNumber:phoneNumber})
+        // const checkNumber =await userModel.findOne({phoneNumber:phoneNumber})
 
         const salt =await bcrypt.genSaltSync(10)
         const hash = await bcrypt.hashSync(password,salt)
@@ -38,13 +38,13 @@ exports.signUp =async(req,res)=>{
         //         message:`this email  ${email} is associated with an account on this platform`
         //     })
 
-        }else if(checkNumber){
+        }else if(checkMail){
             return res.status(400).json({
-                message:"phone number already in use"
+                message:"email  already in use"
             })
 
         }
-        else if(phoneNumber.length !==11){
+        else if(phonenumber.length !==11){
             return res.status(400).json({
                 message: "phone number must be 11 characters"
             })
@@ -54,7 +54,7 @@ exports.signUp =async(req,res)=>{
             } )
         }
         const createdUser =await new userModel(data)
-c
+
      await createdUser.save()
      res.status(200).json({
          message:" info created and saved successfully",
