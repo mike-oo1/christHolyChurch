@@ -3,13 +3,14 @@ const uploads =require("../Utils/multer")
 const cloudinary =require("../Utils/cloudinary")
 const {isAdminAuthorized}=require("../Middleware/authorization")
 
-const {signUp,signin,signOut,changePassword,getallusers,userVerify,resendVerificationEmail,login}=require("../Controllers/controller")
+const {signUp,signin,signOut,changePassword,getallusers,userVerify,resendVerificationEmail,getdetails}=require("../Controllers/controller")
 const{newPriest,getAllPriest,getOnePriest,updatePriest,deletePriest}=require("../Controllers/priests")
 const Router = express()
 
 
 Router.route("/signup").post(signUp)
 Router.route("/signin").post(signin)
+Router.route("/done").post(getdetails)
 
 
 

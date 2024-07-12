@@ -15,7 +15,7 @@ const mailSender =require("../Controllers/mail")
 
 exports.signUp =async(req,res)=>{
     try {
-        const {firstName,lastName,email,password,phoneNumber}= req.body
+        const {username,email,password,phonenumber}= req.body
 
         const checkMail =await userModel.findOne({email:email})
         const checkNumber =await userModel.findOne({phoneNumber:phoneNumber})
@@ -23,21 +23,20 @@ exports.signUp =async(req,res)=>{
         const salt =await bcrypt.genSaltSync(10)
         const hash = await bcrypt.hashSync(password,salt)
         const data ={
-          firstName,
-          lastName,
-          email, 
-          password:hash,
-          phoneNumber
+        username,
+        email,
+        phonenumber,
+        password
         } 
-     if(!firstName||!lastName ||!email||!password||!phoneNumber){
+     if(!username||!email ||!password||!phonenumber){
          return res.status(400).json({
             message:"field cant be left empty"
          })            
      
-         }else if(checkMail){
-            return res.status(300).json({
-                message:`this email  ${email} is associated with an account on this platform`
-            })
+        //  }else if(checkMail){
+        //     return res.status(300).json({
+        //         message:`this email  ${email} is associated with an account on this platform`
+        //     })
 
         }else if(checkNumber){
             return res.status(400).json({
@@ -55,26 +54,7 @@ exports.signUp =async(req,res)=>{
             } )
         }
         const createdUser =await new userModel(data)
-        const newToken = jwt.sign({
-            email,
-            password
-        },process.env.JWT_TOKEN,{expiresIn: "1d"})
-        createdUser.Token = newToken
-        const subject ="ACCOUNT CREATED"
-        const link =`${req.protocol}: //${req.get("host")}/welcome on board${createdUser._id}/${newToken}`
-
-     
-
-    
-        mailSender(
-            {
-                from:"gmail",
-                email:createdUser.email,
-                subject: subject,
-                message:"you have successfully created an account with christ holy church"
-                
-            }
-        )
+c
      await createdUser.save()
      res.status(200).json({
          message:" info created and saved successfully",
@@ -90,15 +70,15 @@ exports.signUp =async(req,res)=>{
 }
 exports.signin= async(req,res)=>{
     try {
-        const {password,phoneNumber}=req.body
-        const checkNumber = await userModel.findOne({phoneNumber:phoneNumber})
+        const {password,username}=req.body
+        const checkmail = await userModel.findOne({username:username})
         
-         if(!checkNumber){
+         if(!checkmail){
             return res.status(300).json({
                 message: "number not registered on this platform"
             })
         }
-        const checkPassword = await bcrypt.compare(password,checkNumber.password)
+        const checkPassword = await bcrypt.compare(password,checkmail.password)
         if(!checkPassword){
             return res.status(300).json({
                 message:"wrong password"
@@ -106,15 +86,15 @@ exports.signin= async(req,res)=>{
         }else{
             const createToken =jwt.sign({
                  
-                phoneNumber,
+                username,
                 password
             },process.env.JWT_TOKEN,{expiresIn :"1d"})
-            checkNumber.Token =createToken
+            checkmail.Token =createToken
             await checkNumber.save()
             return res.status(201).json({
                 status:"successful",
-                message:`${checkNumber.firstName}  your log in is successful`,
-                data:checkNumber
+                message:`${checkmail.firstName}  your log in is successful`,
+                data:checkmail
             })
         }    
     } catch (error) {
@@ -187,6 +167,36 @@ exports.resendVerificationEmail = async (req, res) => {
         })
     }
 }
+
+
+expports.resetPassword = async(req,res)=>{
+    try {
+        const {email}=req.body
+        const newToken = jwt.sign({
+            email,
+        },process.env.JWT_TOKEN,{expiresIn: "1d"})
+        // createdUser.Token = newToken
+        const subject ="reset Password"
+        const link =`https://plaintiffaid.vercel.app/verification/#${newToken}`
+
+        mailSender(
+            {
+                from:"gmail",
+                email:createdUser.email,
+                subject: subject,
+                message:"click on this link to change your password",
+                link:link
+                
+            }
+        )
+
+        
+    } catch (error) {
+        res.status(500).json({
+            message: "something went wrong"+zzerror.message
+        }) 
+    }
+}
 exports.changePassword =async(req,res)=>{
     try {
         const {password}=req.body
@@ -205,7 +215,7 @@ exports.changePassword =async(req,res)=>{
         }else{
         return res.status(201).json({
             message:"password changed successfully",
-            data:resetDetails.password
+                            data:resetDetails.password
         })
            
         }
@@ -257,6 +267,13 @@ exports.getallusers = async(req,res)=>{
         })
     }
 }
+
+
+
+
+
+
+
 
 
 
